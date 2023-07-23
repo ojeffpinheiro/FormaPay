@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import "../styles/LoginPage.css";
+import { useNavigate } from "react-router-dom";
+
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
+import "../styles/LoginPage.css";
+
+
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  
+  const [username, setUsername] = useState("ojeffpinheiro");
+  const [password, setPassword] = useState("12345");
   const [showModal, setShowModal] = useState(false);
   const [showCreateAccountForm, setShowCreateAccountForm] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -13,8 +19,8 @@ const LoginPage = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     // Simulação de autenticação bem-sucedida
-    if (username === "user" && password === "12345") {
-      setSuccessMessage("Login realizado com sucesso!");
+    if (username === "ojeffpinheiro" && password === "12345") {
+      navigate("/dashboard");
       setErrorMessage("");
     } else {
       setErrorMessage("Usuário ou senha incorretos.");
