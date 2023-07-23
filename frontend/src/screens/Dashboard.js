@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 import { getEventsFromDatabase, insertExpense } from "../services/firebaseFunctions";
 
-import EventCard from '../components/EventCard'
+import EventCard from "../components/EventCard";
 import ExpenseEntryModal from "../components/modals/ExpenseEntryModal";
+import PaymentEntryModal from "../components/modals/PaymentEntryModal";
 
 import "../styles/DashboardPage.css";
 
 const DashboardPage = () => {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
-  const [events, setEvents] = useState([])
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null); // Estado para armazenar o evento selecionado
 
   // Simulação de dados resumidos
   const summaryData = {
@@ -20,7 +23,7 @@ const DashboardPage = () => {
     totalPayments: 1800,
   };
 
-  async function fetchData(){
+  async function fetchData() {
     try {
       const fetchedEvent = await getEventsFromDatabase();
       setEvents(fetchedEvent);
@@ -34,15 +37,14 @@ const DashboardPage = () => {
     fetchData();
   }, []);
 
-  
-  async function handleSaveExpense(newExpense){
+  async function handleSaveExpense(newExpense) {
     const { description, amount } = newExpense;
     const id = uuidv4();
 
     const expense = { id, description, amount };
 
     try {
-      if(newExpense){
+      if (newExpense) {
         await insertExpense(expense);
         console.log(expense);
         setIsExpenseModalOpen(false);
@@ -59,9 +61,9 @@ const DashboardPage = () => {
         <button onClick={() => setIsExpenseModalOpen(true)} className="dashboard-button">
           Cadastrar Evento
         </button>
-        <Link to="/payment-registration" className="dashboard-button">
+        <button onClick={() => setIsPaymentModalOpen(true)} className="dashboard-button">
           Registrar Pagamento
-        </Link>
+        </button>
         <Link to="/payment-report-generation" className="dashboard-button">
           Gerar relatório
         </Link>
@@ -87,9 +89,26 @@ const DashboardPage = () => {
           onSave={handleSaveExpense}
         />
       )}
+      {isPaymentModalOpen && (
+        <PaymentEntryModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          onSave={(payment) => {
+            // Implementar a lógica para salvar o pagamento no banco de dados, incluindo o evento selecionado
+            console.log(payment, selectedEvent);
+            setIsPaymentModalOpen(false);
+          }}
+          selectedEvent={selectedEvent} // Passar o evento selecionado como prop
+          events= {events}
+        />
+      )}
       <div className="event-cards-container">
         {events.map((event) => (
-          <EventCard key={event.id} event={event} />
+          <EventCard
+            key={event.id}
+            event={event}
+            onSelect={() => setSelectedEvent(event)} // Função para atualizar o evento selecionado
+          />
         ))}
       </div>
     </div>
