@@ -1,0 +1,19 @@
+.event-card {
+  background-color: var(--card-color);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+.event-card h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: var(--title-color);
+}
+
+.event-card p {
+  font-size: 14px;
+  margin: 4px 0;
+}

@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 
+import { getEventsFromDatabase, insertExpense } from "../services/firebaseFunctions";
 
-import { insertExpense } from "../services/firebaseFunctions";
-
+import EventCard from '../components/EventCard'
 import ExpenseEntryModal from "../components/modals/ExpenseEntryModal";
 
 import "../styles/DashboardPage.css";
 
 const DashboardPage = () => {
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [events, setEvents] = useState([])
+
   // Simulação de dados resumidos
   const summaryData = {
     totalEvents: 5,
@@ -17,8 +20,21 @@ const DashboardPage = () => {
     totalPayments: 1800,
   };
 
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  async function fetchData(){
+    try {
+      const fetchedEvent = await getEventsFromDatabase();
+      setEvents(fetchedEvent);
+      console.log(fetchedEvent);
+    } catch (error) {
+      console.error("Oops, erro ao obter os eventos", error);
+    }
+  }
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  
   async function handleSaveExpense(newExpense){
     const { description, amount } = newExpense;
     const id = uuidv4();
@@ -71,6 +87,11 @@ const DashboardPage = () => {
           onSave={handleSaveExpense}
         />
       )}
+      <div className="event-cards-container">
+        {events.map((event) => (
+          <EventCard key={event.id} event={event} />
+        ))}
+      </div>
     </div>
   );
 };
