@@ -1,5 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
+
+
+import { insertExpense } from "../services/firebaseFunctions";
+
+import ExpenseEntryModal from "../components/modals/ExpenseEntryModal";
+
 import "../styles/DashboardPage.css";
 
 const DashboardPage = () => {
@@ -10,13 +17,32 @@ const DashboardPage = () => {
     totalPayments: 1800,
   };
 
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+
+  async function handleSaveExpense(newExpense){
+    const { description, amount } = newExpense;
+    const id = uuidv4();
+
+    const expense = { id, description, amount };
+
+    try {
+      if(newExpense){
+        await insertExpense(expense);
+        console.log(expense);
+        setIsExpenseModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Oops, erro ao adicionar novo gasto", error);
+    }
+  }
+
   return (
     <div className="dashboard-container">
       <h2 className="dashboard-title">Dashboard</h2>
       <div className="action-buttons">
-        <Link to="/expenses-registration" className="dashboard-button">
-          Cadastrar Gastos
-        </Link>
+        <button onClick={() => setIsExpenseModalOpen(true)} className="dashboard-button">
+          Cadastrar Evento
+        </button>
         <Link to="/payment-registration" className="dashboard-button">
           Registrar Pagamento
         </Link>
@@ -38,6 +64,13 @@ const DashboardPage = () => {
           <p>R$ {summaryData.totalPayments.toFixed(2)}</p>
         </div>
       </div>
+      {isExpenseModalOpen && (
+        <ExpenseEntryModal
+          isOpen={isExpenseModalOpen}
+          onClose={() => setIsExpenseModalOpen(false)}
+          onSave={handleSaveExpense}
+        />
+      )}
     </div>
   );
 };
