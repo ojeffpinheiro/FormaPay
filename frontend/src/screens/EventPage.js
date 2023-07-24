@@ -12,48 +12,40 @@ const EventPage = () => {
   const location = useLocation();
   const { id, description, amount } = location.state.event;
 
-  const [newParticipant, setNewParticipant] = useState("");
+  const [nameParticipant, setNameParticipant] = useState("");
   const [participants, setParticipants] = useState([]);
-
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
 
   async function fetchData() {
     try {
-      const event = await getParticipantsFromDatabase(id);
-      if (event && event.participants) {
-        setParticipants(event.participants);
+      const participantsFromDatabe = await getParticipantsFromDatabase(id);
+      if (participants) {
+        setParticipants(participantsFromDatabe);
       }
     } catch (error) {
       setParticipants([]);
     }
   }
 
-  const handleAddParticipant = async () => {
-    if (newParticipant.trim() !== "") {
-      const updatedParticipants = [...participants, newParticipant];
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
 
-      try {
-        // Aguardar a confirmação do banco de dados antes de atualizar o estado local
-        const success = await addParticipantToEvent(id, updatedParticipants);
-        if (success) {
-          setParticipants(updatedParticipants);
-          setNewParticipant("");
-          // Adicionar feedback de sucesso ao usuário (opcional)
-        } else {
-          // Caso ocorra um erro na função addParticipantToEvent
-          // Reverter o estado local para evitar inconsistências
+  const handleAddParticipant = () => {
+    if (nameParticipant.trim() !== "") {
+  
+      addParticipantToEvent(id, nameParticipant)
+        .then(() => {
+            fetchData();
+            setNameParticipant("");
+            // Adicionar feedback de sucesso ao usuário (opcional)
+          })
+        .catch((error) => {
+          console.error("Erro ao adicionar participante:", error);
+          // Caso ocorra um erro inesperado, reverter o estado local para evitar inconsistências
           // (neste caso, não é necessário fazer nada, pois o estado já foi atualizado)
           // Adicionar feedback de erro ao usuário (opcional)
-        }
-      } catch (error) {
-        console.error("Erro ao adicionar participante:", error);
-        // Caso ocorra um erro inesperado, reverter o estado local para evitar inconsistências
-        // (neste caso, não é necessário fazer nada, pois o estado já foi atualizado)
-        // Adicionar feedback de erro ao usuário (opcional)
-      }
+        });
     }
   };
 
@@ -81,8 +73,8 @@ const EventPage = () => {
         <input
           type="text"
           placeholder="Nome do aluno"
-          value={newParticipant}
-          onChange={(e) => setNewParticipant(e.target.value)}
+          value={nameParticipant}
+          onChange={(e) => setNameParticipant(e.target.value)}
         />
         <button onClick={handleAddParticipant}>Adicionar Aluno</button>
       </div>

@@ -27,10 +27,29 @@ export const getEventsFromDatabase = async () => {
 };
 
 export const addParticipantToEvent = async (eventId, newParticipant) => {
-  const eventRef = ref(database, `events/${eventId}/participants`);
-  const newParticipantRef = push(eventRef);
-  await set(newParticipantRef, newParticipant);
+  const participantsRef = ref(database, `events/${eventId}/participants`);
+
+  try {
+    // Obtém a lista de participantes atuais no banco de dados
+    const currentParticipantsSnapshot = await get(participantsRef);
+    const currentParticipants = currentParticipantsSnapshot.val() || [];
+
+    // Adiciona o novo participante à lista atual
+    currentParticipants.push(newParticipant);
+
+    // Atualiza a lista de participantes no banco de dados com o novo array
+    await set(participantsRef, currentParticipants);
+
+    // Retorne true para indicar sucesso
+    return true;
+  } catch (error) {
+    // Caso ocorra um erro ao adicionar o participante
+    console.error("Erro ao adicionar participante ao evento no banco de dados", error);
+    // Retorne false para indicar falha
+    return false;
+  }
 };
+
 
 // Função para obter os participantes do evento do banco de dados
 export const getParticipantsFromDatabase = async (eventId) => {

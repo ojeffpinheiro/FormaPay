@@ -28,7 +28,7 @@ FormaPay é uma aplicação de gerenciamento de pagamentos de passeios e formatu
 # :pencil: Funcionalidades
 - Web App (ReactJS)
     - [x] Cadastro de gastos de passeios e formaturas.
-    - [ ] Informar alunos que irão participar de cada evento.
+    - [x] Informar alunos que irão participar de cada evento.
     - [ ] Definir os valores individuais de pagamento com base nos gastos e número de alunos.
     - [x] Registrar os pagamentos feitos pelos alunos.
     - [ ] Gerar relatórios de pagamentos e receitas.
