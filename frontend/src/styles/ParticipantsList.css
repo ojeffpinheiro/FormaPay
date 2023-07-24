@@ -1,0 +1,37 @@
+.participants-container {
+  margin-top: 1rem;
+  width: 30rem;
+}
+
+.participants-list {
+  list-style: none;
+  padding: 0;
+}
+
+.participants-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: var(--card-color);
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  transition: background-color 0.2s;
+}
+
+.participants-list li button {
+  background-color: var(--primary-color);
+  border: none;
+  cursor: pointer;
+}
+
+.participants-list li button:hover {
+  color: var(--card-color);
+}
+
+.no-participants-message {
+  font-size: 14px;
+  color: #777;
+  margin-top: 10px;
+}
