@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useNavigate } from "react-router-dom";
 
 import {
   getEventsFromDatabase,
@@ -14,10 +15,13 @@ import PaymentReportModal from "../components/modals/PaymentReportModal";
 import "../styles/DashboardPage.css";
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
+
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isPaymentReportModalOpen, setIsPaymentReportModalOpen] =
-    useState(false);
+  const [isPaymentReportModalOpen, setIsPaymentReportModalOpen] = useState(
+    false
+  );
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null); // Estado para armazenar o evento selecionado
 
@@ -32,7 +36,6 @@ const DashboardPage = () => {
     try {
       const fetchedEvent = await getEventsFromDatabase();
       setEvents(fetchedEvent);
-      console.log(fetchedEvent);
     } catch (error) {
       console.error("Oops, erro ao obter os eventos", error);
     }
@@ -41,6 +44,11 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  function handleEventClick(event) {
+    setSelectedEvent(event); // Atualiza o evento selecionado
+    navigate("/event", { state: { event } }); // Redireciona para a página de detalhes do evento
+  }
 
   async function handleSaveExpense(newExpense) {
     const { description, amount } = newExpense;
@@ -51,7 +59,6 @@ const DashboardPage = () => {
     try {
       if (newExpense) {
         await insertExpense(expense);
-        console.log(expense);
         setIsExpenseModalOpen(false);
       }
     } catch (error) {
@@ -116,7 +123,6 @@ const DashboardPage = () => {
           onClose={() => setIsPaymentModalOpen(false)}
           onSave={(payment) => {
             // Implementar a lógica para salvar o pagamento no banco de dados, incluindo o evento selecionado
-            console.log(payment, selectedEvent);
             setIsPaymentModalOpen(false);
           }}
           selectedEvent={selectedEvent} // Passar o evento selecionado como prop
@@ -128,6 +134,7 @@ const DashboardPage = () => {
           <EventCard
             key={event.id}
             event={event}
+            onClick={() => handleEventClick(event)} // Trata o clique no card do evento
             onSelect={() => setSelectedEvent(event)} // Função para atualizar o evento selecionado
           />
         ))}
