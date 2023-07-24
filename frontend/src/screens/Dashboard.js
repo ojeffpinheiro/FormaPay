@@ -43,7 +43,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [events]);
 
   function handleEventClick(event) {
     setSelectedEvent(event); // Atualiza o evento selecionado

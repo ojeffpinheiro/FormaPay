@@ -1,36 +1,84 @@
 .event-page-container {
-  background-color: var(--background-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
-  margin: 0 auto;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .event-title {
   font-size: 24px;
   font-weight: bold;
-  color: var(--title-color);
   margin-bottom: 10px;
+  color: var(--primary-color);
 }
 
 .event-info {
-  font-size: 16px;
-  color: var(--text-color);
+  font-size: 18px;
+  margin-bottom: 20px;
 }
 
 .amount {
-  font-weight: bold;
   color: var(--secondary-color);
 }
 
-.back-button {
-  background-color: var(--primary-color);
-  color: #ffffff;
+.participants-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.participants-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.participants-list li {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.add-participant-container {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.add-participant-container input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.add-participant-container button {
+  margin-left: 10px;
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
-  padding: 10px 20px;
-  cursor: pointer;
+  background-color: var(--save-button-color);
+  color: #ffffff;
   font-size: 16px;
+  cursor: pointer;
+}
+
+.add-participant-container button:hover {
+  background-color: var(--highlight-color);
+}
+
+.back-button {
   margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--cancel-button-color);
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background-color: var(--highlight-color);
 }

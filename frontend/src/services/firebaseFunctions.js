@@ -6,7 +6,9 @@ export const insertExpense = async (expense) => {
   const expenseRef = ref(database, "events");
   const newExpenseRef = push(expenseRef);
 
-  await set(newExpenseRef, expense);
+  const newExpense = { ...expense, participants : [], id: newExpenseRef.key };
+
+  await set(newExpenseRef, newExpense);
 };
 
 // Função para obter os eventos do banco de dados
@@ -21,5 +23,26 @@ export const getEventsFromDatabase = async () => {
     }
   } catch (error) {
     console.error("Erro ao obter os eventos do banco de dados", error);
+  }
+};
+
+export const addParticipantToEvent = async (eventId, newParticipant) => {
+  const eventRef = ref(database, `events/${eventId}/participants`);
+  const newParticipantRef = push(eventRef);
+  await set(newParticipantRef, newParticipant);
+};
+
+// Função para obter os participantes do evento do banco de dados
+export const getParticipantsFromDatabase = async (eventId) => {
+  const participantsRef = ref(database, `events/${eventId}/participants`);
+  try {
+    const participantsSnapshot = await get(participantsRef);
+    if (participantsSnapshot.exists()) {
+      return Object.values(participantsSnapshot.val());
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Erro ao obter os participantes do evento do banco de dados", error);
   }
 };
