@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-import { getEventsFromDatabase, insertExpense } from "../services/firebaseFunctions";
+import {
+  getEventsFromDatabase,
+  insertExpense,
+} from "../services/firebaseFunctions";
 
 import EventCard from "../components/EventCard";
 import ExpenseEntryModal from "../components/modals/ExpenseEntryModal";
 import PaymentEntryModal from "../components/modals/PaymentEntryModal";
+import PaymentReportModal from "../components/modals/PaymentReportModal";
 
 import "../styles/DashboardPage.css";
 
 const DashboardPage = () => {
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isPaymentReportModalOpen, setIsPaymentReportModalOpen] =
+    useState(false);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null); // Estado para armazenar o evento selecionado
 
@@ -58,15 +63,24 @@ const DashboardPage = () => {
     <div className="dashboard-container">
       <h2 className="dashboard-title">Dashboard</h2>
       <div className="action-buttons">
-        <button onClick={() => setIsExpenseModalOpen(true)} className="dashboard-button">
+        <button
+          onClick={() => setIsExpenseModalOpen(true)}
+          className="dashboard-button"
+        >
           Cadastrar Evento
         </button>
-        <button onClick={() => setIsPaymentModalOpen(true)} className="dashboard-button">
+        <button
+          onClick={() => setIsPaymentModalOpen(true)}
+          className="dashboard-button"
+        >
           Registrar Pagamento
         </button>
-        <Link to="/payment-report-generation" className="dashboard-button">
+        <button
+          onClick={() => setIsPaymentReportModalOpen(true)}
+          className="dashboard-button"
+        >
           Gerar relatório
-        </Link>
+        </button>
       </div>
       <div className="summary-container">
         <div className="summary-card">
@@ -82,6 +96,13 @@ const DashboardPage = () => {
           <p>R$ {summaryData.totalPayments.toFixed(2)}</p>
         </div>
       </div>
+      {isPaymentReportModalOpen && (
+        <PaymentReportModal
+          isOpen={isPaymentReportModalOpen}
+          onClose={() => setIsPaymentReportModalOpen(false)}
+          onGenerateReport={() => {}}
+        />
+      )}
       {isExpenseModalOpen && (
         <ExpenseEntryModal
           isOpen={isExpenseModalOpen}
@@ -99,7 +120,7 @@ const DashboardPage = () => {
             setIsPaymentModalOpen(false);
           }}
           selectedEvent={selectedEvent} // Passar o evento selecionado como prop
-          events= {events}
+          events={events}
         />
       )}
       <div className="event-cards-container">
