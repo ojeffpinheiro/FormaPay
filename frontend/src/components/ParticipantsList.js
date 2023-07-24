@@ -3,7 +3,7 @@ import { AiOutlineDelete } from 'react-icons/ai';
 
 import '../styles/ParticipantsList.css';
 
-export const ParticipantsList = ({ participants, handleRemoveParticipant }) => {
+export const ParticipantsList = ({ participants, handleRemoveParticipant, valuePerStudent }) => {
 
   return (
     <div className="participants-container">
@@ -22,6 +22,9 @@ export const ParticipantsList = ({ participants, handleRemoveParticipant }) => {
       ) : (
         <p>Não há alunos participantes ainda.</p>
       )}
+
+      {/* Exibe o valor do evento por aluno */}
+      <p>Valor do evento por aluno: R$ {valuePerStudent.toFixed(2)}</p>
     </div>
   );
 };

@@ -7,6 +7,8 @@ import {
   getParticipantsFromDatabase,
 } from "../services/firebaseFunctions";
 
+import { calculateEventValuePerStudent } from "../utils/financialUtils";
+
 import { ParticipantsList } from "../components/ParticipantsList";
 
 import "../styles/EventPage.css";
@@ -17,6 +19,8 @@ const EventPage = () => {
 
   const [nameParticipant, setNameParticipant] = useState("");
   const [participants, setParticipants] = useState([]);
+  
+  const eventValuePerStudent = calculateEventValuePerStudent(amount, participants.length);
 
   // Buscar os participantes do evento assim que a página for carregada
   useEffect(() => {
@@ -73,7 +77,7 @@ const EventPage = () => {
       <ParticipantsList
         participants={participants}
         handleRemoveParticipant={handleRemoveParticipant}
-      />
+        valuePerStudent={eventValuePerStudent} />
 
       <div className="add-participant-container">
         <input

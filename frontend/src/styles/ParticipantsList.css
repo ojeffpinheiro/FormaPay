@@ -3,6 +3,10 @@
   width: 30rem;
 }
 
+.participants-container p {
+  margin: 1rem;
+}
+
 .participants-list {
   list-style: none;
   padding: 0;
