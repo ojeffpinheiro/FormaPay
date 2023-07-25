@@ -1,7 +1,9 @@
-import { get, push, ref, set } from "firebase/database";
+import { get, push, ref, set, update } from "firebase/database";
 import { v4 as uuidv4 } from "uuid";
 
 import { database } from "../config/firebaseConfig";
+
+import { sumPayments} from '../utils/financialUtils'
 
 // Função para inserir um novo gasto no banco de dados
 export const insertExpense = async (expense) => {
@@ -76,6 +78,21 @@ export const addPaymentToParticipant = async (data) => {
   }
 };
 
+export const getPaymentsFromParticipant = async (data) => {
+  const { eventId, participantId } = data;
+  const paymentsRef = ref(database, `events/${eventId}/participants/${participantId}/payments`);
+  try {
+    const paymentsSnapshot = await get(paymentsRef);
+    if (paymentsSnapshot.exists()) {
+      return Object.values(paymentsSnapshot.val());
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Erro ao obter pagamentos do banco de dados", error);
+  }
+}
+
 // Função para encontrar o ID de um participante com base no nome
 export const findParticipantIdByName = (participants, participantName) => {
   for (const participant of participants) {
@@ -85,3 +102,14 @@ export const findParticipantIdByName = (participants, participantName) => {
   }
   return null; // Retorna null se o participante não for encontrado
 };
+
+export const updateAmountPaid = async (data) => {
+  const { eventId, participantId  } = data
+  try {
+    const newAmoutPaid = await sumPayments(data);
+    const participantRef = ref(database, `events/${eventId}/participants/${participantId}`);
+    await update(participantRef, { amountPaid: newAmoutPaid });
+  } catch (error) {
+    console.error("Erro ao atualizar a soma dos pagamentos", error);
+  }
+}

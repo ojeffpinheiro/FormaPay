@@ -1,5 +1,10 @@
+import { getPaymentsFromParticipant } from "../services/firebaseFunctions";
+
 // Função para calcular os valores individuais de pagamento para cada aluno
-export const calculateEventValuePerStudent = (totalExpenses, numParticipants) => {
+export const calculateEventValuePerStudent = (
+  totalExpenses,
+  numParticipants
+) => {
   if (numParticipants <= 0) {
     return 0;
   }
@@ -12,4 +17,13 @@ export const calculateAmountPaidByStudent = (payments) => {
     return 0;
   }
   return payments.reduce((total, payment) => total + payment, 0);
+};
+
+export const sumPayments = async (data) => {
+  const payments = await getPaymentsFromParticipant(data);
+  let totalAmount = 0;
+  for (const payment of payments) {
+    totalAmount += payment.amount;
+  }
+  return totalAmount;
 };

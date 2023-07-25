@@ -8,6 +8,7 @@ import {
   getEventsFromDatabase,
   getParticipantsFromDatabase,
   insertExpense,
+  updateAmountPaid,
 } from "../services/firebaseFunctions";
 
 import EventCard from "../components/EventCard";
@@ -78,6 +79,7 @@ const DashboardPage = () => {
     try {
       if(newPayment) {
         await addPaymentToParticipant(data);
+        await updateAmountPaid(data);
         setIsPaymentModalOpen(false);
       }
     } catch (error) {
