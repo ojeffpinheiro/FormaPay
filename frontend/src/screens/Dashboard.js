@@ -21,66 +21,76 @@ import "../styles/DashboardPage.css";
 const DashboardPage = () => {
   const navigate = useNavigate();
 
+  // State para controle dos modais
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [isPaymentReportModalOpen, setIsPaymentReportModalOpen] = useState(
-    false
-  );
-  const [events, setEvents] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null); // Estado para armazenar o evento selecionado
+  const [isPaymentReportModalOpen, setIsPaymentReportModalOpen] = useState(false);
 
-  // Simulação de dados resumidos
+  // State para armazenar os eventos
+  const [events, setEvents] = useState([]);
+
+  // Dados resumidos simulados
   const summaryData = {
-    totalEvents: 5,
-    totalExpenses: 2500,
-    totalPayments: 1800,
+    totalEvents: 0,
+    totalExpenses: 0,
+    totalPayments: 0,
   };
 
-  async function fetchData() {
+  // Função para buscar os eventos na base de dados
+  async function fetchEvents() {
     try {
-      const fetchedEvent = await getEventsFromDatabase();
-      setEvents(fetchedEvent);
+      const fetchedEvents = await getEventsFromDatabase();
+      setEvents(fetchedEvents);
     } catch (error) {
       console.error("Oops, erro ao obter os eventos", error);
     }
   }
 
+  // Carrega os eventos ao montar o componente
   useEffect(() => {
-    fetchData();
-  }, [events]);
+    fetchEvents();
+  }, []);
 
+  // Função para tratar o clique em um evento
   function handleEventClick(event) {
-    setSelectedEvent(event); // Atualiza o evento selecionado
-    navigate("/event", { state: { event } }); // Redireciona para a página de detalhes do evento
+    navigate("/event", { state: { event } });
   }
 
+  // Função para salvar um novo gasto
   async function handleSaveExpense(newExpense) {
-    const { description, amount } = newExpense;
+    const { description, amountPerStudent } = newExpense;
     const id = uuidv4();
 
-    const expense = { id, description, amount };
+    const expense = { id, description, amountPerStudent };
 
     try {
       if (newExpense) {
         await insertExpense(expense);
         setIsExpenseModalOpen(false);
+        // Atualiza a lista de eventos após inserção
+        fetchEvents();
       }
     } catch (error) {
       console.error("Oops, erro ao adicionar novo gasto", error);
     }
   }
 
+  // Função para salvar um novo pagamento
   async function handleSavePayment(newPayment) {
     const { eventId } = newPayment;
     const participants = await getParticipantsFromDatabase(eventId);
-    const participantId = await findParticipantIdByName(participants, newPayment.name);
-    const data = { eventId, participantId, amount: newPayment.amountPaid };
+    const participantId = await findParticipantIdByName(
+      participants,
+      newPayment.studentName
+    );
 
     try {
-      if(newPayment) {
-        await addPaymentToParticipant(data);
-        await updateAmountPaid(data);
+      if (newPayment) {
+        await addPaymentToParticipant(eventId, participantId, newPayment.value);
+        await updateAmountPaid(eventId, participantId, newPayment.value);
         setIsPaymentModalOpen(false);
+        // Atualiza a lista de eventos após inserção
+        fetchEvents();
       }
     } catch (error) {
       console.error("Oops, erro ao adicionar novo pagamento", error);
@@ -93,17 +103,20 @@ const DashboardPage = () => {
       <div className="action-buttons">
         <button
           onClick={() => setIsExpenseModalOpen(true)}
-          className="dashboard-button">
+          className="dashboard-button"
+        >
           Cadastrar Evento
         </button>
         <button
           onClick={() => setIsPaymentModalOpen(true)}
-          className="dashboard-button">
+          className="dashboard-button"
+        >
           Registrar Pagamento
         </button>
         <button
           onClick={() => setIsPaymentReportModalOpen(true)}
-          className="dashboard-button">
+          className="dashboard-button"
+        >
           Gerar relatório
         </button>
       </div>
@@ -114,13 +127,14 @@ const DashboardPage = () => {
         </div>
         <div className="summary-card">
           <h3>Total de Gastos</h3>
-          <p>R$ {summaryData.totalExpenses.toFixed(2)}</p>
+          <p>R$ {summaryData.totalExpenses}</p>
         </div>
         <div className="summary-card">
           <h3>Total de Pagamentos</h3>
-          <p>R$ {summaryData.totalPayments.toFixed(2)}</p>
+          <p>R$ {summaryData.totalPayments}</p>
         </div>
       </div>
+      {/* Modais */}
       {isPaymentReportModalOpen && (
         <PaymentReportModal
           isOpen={isPaymentReportModalOpen}
@@ -140,20 +154,29 @@ const DashboardPage = () => {
           isOpen={isPaymentModalOpen}
           onClose={() => setIsPaymentModalOpen(false)}
           onSave={handleSavePayment}
-          selectedEvent={selectedEvent} // Passar o evento selecionado como prop
           events={events}
         />
       )}
-      <div className="event-cards-container">
-        {events.map((event) => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onClick={() => handleEventClick(event)} // Trata o clique no card do evento
-            onSelect={() => setSelectedEvent(event)} // Função para atualizar o evento selecionado
-          />
-        ))}
-      </div>
+      {/* Lista de eventos */}
+      {events.length > 0 ? (
+        <div className="event-cards-container">
+          {events.map((event) => (
+            <EventCard
+              key={event.id}
+              description={event.description}
+              amountPerStudent={event.amountPerStudent}
+              numParticipants={
+                event.participants ? Object.keys(event.participants).length : 0
+              }
+              onClick={() => handleEventClick(event)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="event-cards-container">
+          <p>Nenhum evento encontrado</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+
 import { AiOutlineUserAdd } from "react-icons/ai";
 
 import {
@@ -7,20 +8,18 @@ import {
   getParticipantsFromDatabase,
 } from "../services/firebaseFunctions";
 
-import { calculateEventValuePerStudent } from "../utils/financialUtils";
-
-import { ParticipantsList } from "../components/ParticipantsList";
+import ParticipantsList  from "../components/ParticipantsList";
 
 import "../styles/EventPage.css";
 
 const EventPage = () => {
   const location = useLocation();
-  const { id, description, amount } = location.state.event;
+  const { id, description, amountPerStudent } = location.state.event;
 
-  const [nameParticipant, setNameParticipant] = useState("");
+  const [studentName, setStudentName] = useState("");
   const [participants, setParticipants] = useState([]);
-  
-  const eventValuePerStudent = calculateEventValuePerStudent(amount, participants.length);
+
+  const totalAmount = amountPerStudent * participants.length;
 
   const fetchData = async () => {
     try {
@@ -39,14 +38,14 @@ const EventPage = () => {
   }, []);
 
   const handleAddParticipant = async () => {
-    if (nameParticipant.trim() !== "") {
+    if (studentName.trim() !== "") {
       try {
         // Adicionar o participante ao evento
-        await addParticipantToEvent(id, nameParticipant);
+        await addParticipantToEvent(id, studentName);
         // Atualizar a lista de participantes
-        setParticipants([...participants, nameParticipant]);
+        setParticipants([...participants, studentName]);
         // Limpar o input
-        setNameParticipant("");
+        setStudentName("");
       } catch (error) {
         console.error("Erro ao adicionar participante:", error);
         // Adicionar feedback de erro ao usuário (opcional)
@@ -54,6 +53,11 @@ const EventPage = () => {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, [participants])
+  
   const handleRemoveParticipant = async (index) => {
     try {
       // Remover o participante da lista pelo índice
@@ -71,20 +75,20 @@ const EventPage = () => {
     <div className="event-page-container">
       <h1 className="event-title">Evento: {description}</h1>
       <p className="event-info">
-        Valor do evento: <span className="amount">R$ {amount}</span>
+        Valor total: <span className="amount">R$ {totalAmount}</span>
       </p>
 
       <ParticipantsList
         participants={participants}
         handleRemoveParticipant={handleRemoveParticipant}
-        valuePerStudent={eventValuePerStudent} />
+        valuePerStudent={amountPerStudent} />
 
       <div className="add-participant-container">
         <input
           type="text"
           placeholder="Nome do aluno"
-          value={nameParticipant}
-          onChange={(e) => setNameParticipant(e.target.value)}
+          value={studentName}
+          onChange={(e) => setStudentName(e.target.value)}
         />
         <button onClick={handleAddParticipant}>
           <AiOutlineUserAdd />

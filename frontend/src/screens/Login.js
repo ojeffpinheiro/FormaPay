@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import ForgotPasswordModal from "../components/ForgotPasswordModal";
+import ForgotPasswordModal from "../components/modals/ForgotPasswordModal";
 
 import "../styles/LoginPage.css";
 
-
 const LoginPage = () => {
   const navigate = useNavigate();
-  
+
   const [username, setUsername] = useState("ojeffpinheiro");
   const [password, setPassword] = useState("12345");
   const [showModal, setShowModal] = useState(false);
@@ -102,10 +101,13 @@ const LoginPage = () => {
           </>
         )}
       </div>
-      <ForgotPasswordModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-      />
+
+      {showModal && (
+        <ForgotPasswordModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

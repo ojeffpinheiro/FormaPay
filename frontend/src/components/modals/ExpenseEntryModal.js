@@ -3,25 +3,32 @@ import "../../styles/ExpenseEntryModal.css";
 
 const ExpenseEntryModal = ({ isOpen, onClose, onSave }) => {
   const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amountPerStudent, setAmountPerStudent] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSave = () => {
-    // Validation of fields (optional)
-    if (description.trim() === "" || isNaN(amount) || Number(amount) <= 0) {
-      alert("Por favor, preencha todos os campos obrigatórios.");
-      return;
+  // Função para salvar o registro de gasto
+  const handleSaveExpense = () => {
+    if (validateFields()) {
+      onSave({
+        description,
+        amountPerStudent: Number(amountPerStudent),
+      });
+
+      // Limpar campos e fechar o modal
+      setDescription("");
+      setAmountPerStudent("");
+      onClose();
     }
+  };
 
-    // Call the callback function to save the expense entry
-    onSave({
-      description,
-      amount: Number(amount),
-    });
-
-    // Clear fields and close the modal
-    setDescription("");
-    setAmount("");
-    onClose();
+  // Função para validar os campos
+  const validateFields = () => {
+    if (description.trim() === "" || isNaN(amountPerStudent) || Number(amountPerStudent) <= 0) {
+      setErrorMessage("Por favor, preencha todos os campos obrigatórios.");
+      return false;
+    }
+    setErrorMessage("");
+    return true;
   };
 
   return (
@@ -40,18 +47,19 @@ const ExpenseEntryModal = ({ isOpen, onClose, onSave }) => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="amount">Valor:</label>
+            <label htmlFor="amountPerStudent">Valor por aluno:</label>
             <input
               type="number"
-              id="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              id="amountPerStudent"
+              value={amountPerStudent}
+              onChange={(e) => setAmountPerStudent(e.target.value)}
               required
             />
           </div>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="modal-buttons">
             <button type="button" onClick={onClose}>Cancelar</button>
-            <button type="button" onClick={handleSave}>Salvar</button>
+            <button type="button" onClick={handleSaveExpense}>Salvar</button>
           </div>
         </form>
       </div>

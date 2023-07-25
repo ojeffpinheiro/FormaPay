@@ -4,21 +4,26 @@ import "../../styles/PaymentReportModal.css";
 const PaymentReportModal = ({ isOpen, onClose, onGenerateReport }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleGenerateReport = () => {
-    // Validation of fields (optional)
-    if (startDate.trim() === "" || endDate.trim() === "") {
-      alert("Por favor, preencha todas as datas.");
-      return;
+    if (validateFields()) {
+      onGenerateReport(startDate, endDate);
+
+      // Limpar campos e fechar o modal
+      setStartDate("");
+      setEndDate("");
+      onClose();
     }
+  };
 
-    // Call the callback function to generate the report
-    onGenerateReport(startDate, endDate);
-
-    // Clear fields and close the modal
-    setStartDate("");
-    setEndDate("");
-    onClose();
+  const validateFields = () => {
+    if (startDate.trim() === "" || endDate.trim() === "") {
+      setErrorMessage("Por favor, preencha todas as datas.");
+      return false;
+    }
+    setErrorMessage("");
+    return true;
   };
 
   return (
@@ -46,11 +51,16 @@ const PaymentReportModal = ({ isOpen, onClose, onGenerateReport }) => {
               required
             />
           </div>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="modal-buttons">
             <button type="button" onClick={onClose} className="cancel-button">
               Cancelar
             </button>
-            <button type="button" onClick={handleGenerateReport} className="generate-button">
+            <button
+              type="button"
+              onClick={handleGenerateReport}
+              className="generate-button"
+            >
               Gerar Relatório
             </button>
           </div>
