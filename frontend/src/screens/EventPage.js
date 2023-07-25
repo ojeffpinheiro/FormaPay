@@ -22,12 +22,6 @@ const EventPage = () => {
   
   const eventValuePerStudent = calculateEventValuePerStudent(amount, participants.length);
 
-  // Buscar os participantes do evento assim que a página for carregada
-  useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line
-  }, []);
-
   const fetchData = async () => {
     try {
       const participantsFromDatabase = await getParticipantsFromDatabase(id);
@@ -37,6 +31,12 @@ const EventPage = () => {
       setParticipants([]);
     }
   };
+
+  // Buscar os participantes do evento assim que a página for carregada
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line
+  }, []);
 
   const handleAddParticipant = async () => {
     if (nameParticipant.trim() !== "") {
@@ -71,7 +71,7 @@ const EventPage = () => {
     <div className="event-page-container">
       <h1 className="event-title">Evento: {description}</h1>
       <p className="event-info">
-        Valor do evento: <span className="amount">R$ {amount.toFixed(2)}</span>
+        Valor do evento: <span className="amount">R$ {amount}</span>
       </p>
 
       <ParticipantsList

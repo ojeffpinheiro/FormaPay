@@ -1,4 +1,6 @@
 import { get, push, ref, set } from "firebase/database";
+import { v4 as uuidv4 } from 'uuid'
+
 import { database } from "../config/firebaseConfig";
 
 // Função para inserir um novo gasto no banco de dados
@@ -26,6 +28,7 @@ export const getEventsFromDatabase = async () => {
   }
 };
 
+// Função para adicionar um novo participante ao evento
 export const addParticipantToEvent = async (eventId, newParticipant) => {
   const participantsRef = ref(database, `events/${eventId}/participants`);
 
@@ -34,11 +37,14 @@ export const addParticipantToEvent = async (eventId, newParticipant) => {
     const currentParticipantsSnapshot = await get(participantsRef);
     const currentParticipants = currentParticipantsSnapshot.val() || [];
 
-    // Adiciona o novo participante à lista atual
-    currentParticipants.push(newParticipant);
+    // Adiciona o novo participante ao array de participantes atual
+    const updatedParticipants = [
+      ...currentParticipants,
+      { id: uuidv4(), name: newParticipant, amountPaid: 0 },
+    ];
 
     // Atualiza a lista de participantes no banco de dados com o novo array
-    await set(participantsRef, currentParticipants);
+    await set(participantsRef, updatedParticipants);
 
     // Retorne true para indicar sucesso
     return true;

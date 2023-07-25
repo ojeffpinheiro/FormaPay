@@ -12,7 +12,7 @@ export const ParticipantsList = ({ participants, handleRemoveParticipant, valueP
         <ul className="participants-list">
           {participants.map((participant, index) => (
             <li key={index}>
-              {participant}
+              {participant.studentName} - R$ {participant.amountPaid.toFixed(2)}
               <button onClick={() => handleRemoveParticipant(index)}>
                 <AiOutlineDelete />
               </button>
@@ -22,7 +22,6 @@ export const ParticipantsList = ({ participants, handleRemoveParticipant, valueP
       ) : (
         <p>Não há alunos participantes ainda.</p>
       )}
-
       {/* Exibe o valor do evento por aluno */}
       <p>Valor do evento por aluno: R$ {valuePerStudent.toFixed(2)}</p>
     </div>

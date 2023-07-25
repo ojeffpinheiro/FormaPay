@@ -66,26 +66,27 @@ const DashboardPage = () => {
     }
   }
 
+  async function handleSavePayment() {
+    setIsPaymentModalOpen(false);
+  }
+
   return (
     <div className="dashboard-container">
       <h2 className="dashboard-title">Dashboard</h2>
       <div className="action-buttons">
         <button
           onClick={() => setIsExpenseModalOpen(true)}
-          className="dashboard-button"
-        >
+          className="dashboard-button">
           Cadastrar Evento
         </button>
         <button
           onClick={() => setIsPaymentModalOpen(true)}
-          className="dashboard-button"
-        >
+          className="dashboard-button">
           Registrar Pagamento
         </button>
         <button
           onClick={() => setIsPaymentReportModalOpen(true)}
-          className="dashboard-button"
-        >
+          className="dashboard-button">
           Gerar relatório
         </button>
       </div>
@@ -121,10 +122,7 @@ const DashboardPage = () => {
         <PaymentEntryModal
           isOpen={isPaymentModalOpen}
           onClose={() => setIsPaymentModalOpen(false)}
-          onSave={(payment) => {
-            // Implementar a lógica para salvar o pagamento no banco de dados, incluindo o evento selecionado
-            setIsPaymentModalOpen(false);
-          }}
+          onSave={handleSavePayment}
           selectedEvent={selectedEvent} // Passar o evento selecionado como prop
           events={events}
         />
