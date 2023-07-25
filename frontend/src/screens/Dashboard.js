@@ -3,7 +3,10 @@ import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 
 import {
+  addPaymentToParticipant,
+  findParticipantIdByName,
   getEventsFromDatabase,
+  getParticipantsFromDatabase,
   insertExpense,
 } from "../services/firebaseFunctions";
 
@@ -66,8 +69,20 @@ const DashboardPage = () => {
     }
   }
 
-  async function handleSavePayment() {
-    setIsPaymentModalOpen(false);
+  async function handleSavePayment(newPayment) {
+    const { eventId } = newPayment;
+    const participants = await getParticipantsFromDatabase(eventId);
+    const participantId = await findParticipantIdByName(participants, newPayment.name);
+    const data = { eventId, participantId, amount: newPayment.amountPaid };
+
+    try {
+      if(newPayment) {
+        await addPaymentToParticipant(data);
+        setIsPaymentModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Oops, erro ao adicionar novo pagamento", error);
+    }
   }
 
   return (

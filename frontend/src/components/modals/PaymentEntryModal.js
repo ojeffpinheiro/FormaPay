@@ -1,14 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import { getParticipantsFromDatabase } from "../../services/firebaseFunctions";
+
 import "../../styles/PaymentEntryModal.css";
 
 const PaymentEntryModal = ({ isOpen, onClose, onSave, events }) => {
   const [selectedEventId, setSelectedEventId] = useState("");
-  const [studentName, setStudentName] = useState("");
+  const [participants, setParticipants] = useState([]);
+  const [selectedParticipantId, setSelectedParticipantId] = useState("");
   const [amountPaid, setAmountPaid] = useState("");
+
+  const handleGetParticipants = async (eventId) => {
+    const participants = await getParticipantsFromDatabase(eventId);
+    setParticipants(participants);
+  }
+
+  useEffect(() => {
+    handleGetParticipants(selectedEventId);
+  }, [selectedEventId]);
 
   const handleSave = () => {
     // Validation of fields (optional)
-    if (selectedEventId.trim() === "" || studentName.trim() === "" || isNaN(amountPaid) || Number(amountPaid) <= 0) {
+    if (selectedEventId.trim() === "" || selectedParticipantId.trim() === "" || isNaN(amountPaid) || Number(amountPaid) <= 0) {
       alert("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
@@ -24,16 +37,25 @@ const PaymentEntryModal = ({ isOpen, onClose, onSave, events }) => {
     // Call the callback function to save the payment entry
     onSave({
       eventId: selectedEvent.id,
-      eventName: selectedEvent.name,
-      studentName,
+      eventName: selectedEvent.description,
+      studentName: selectedParticipantId.name,
       amountPaid: Number(amountPaid),
     });
 
     // Clear fields and close the modal
     setSelectedEventId("");
-    setStudentName("");
+    setSelectedParticipantId("");
     setAmountPaid("");
     onClose();
+  };
+
+  const handleEventChange = (e) => {
+    const selectedEventId = e.target.value;
+    setSelectedEventId(selectedEventId);
+
+    // Reset the selected participant ID
+    setSelectedParticipantId("");
+    setAmountPaid("");
   };
 
   return (
@@ -46,9 +68,8 @@ const PaymentEntryModal = ({ isOpen, onClose, onSave, events }) => {
             <select
               id="event"
               value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              required
-            >
+              onChange={handleEventChange}
+              required>
               <option value="">Selecione um evento</option>
               {events.map((event) => (
                 <option key={event.id} value={event.id}>
@@ -57,16 +78,23 @@ const PaymentEntryModal = ({ isOpen, onClose, onSave, events }) => {
               ))}
             </select>
           </div>
-          <div className="form-group">
-            <label htmlFor="studentName">Nome do Aluno:</label>
-            <input
-              type="text"
-              id="studentName"
-              value={studentName}
-              onChange={(e) => setStudentName(e.target.value)}
-              required
-            />
-          </div>
+          {selectedEventId && (
+            <div className="form-group">
+              <label htmlFor="studentName">Nome do Aluno:</label>
+              <select
+                id="studentName"
+                value={selectedParticipantId}
+                onChange={(e) => setSelectedParticipantId(e.target.value)}
+                required>
+                <option value="">Selecione um aluno</option>
+                {participants.map(participant => (
+                    <option key={participant.id} value={participant.id}>
+                      {participant.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
           <div className="form-group">
             <label htmlFor="amountPaid">Valor Pago:</label>
             <input

@@ -1,5 +1,5 @@
 import { get, push, ref, set } from "firebase/database";
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from "uuid";
 
 import { database } from "../config/firebaseConfig";
 
@@ -29,33 +29,13 @@ export const getEventsFromDatabase = async () => {
 };
 
 // Função para adicionar um novo participante ao evento
-export const addParticipantToEvent = async (eventId, newParticipant) => {
+export const addParticipantToEvent = async (eventId, participantName) => {
   const participantsRef = ref(database, `events/${eventId}/participants`);
+  const newParticipantRef = push(participantsRef);
 
-  try {
-    // Obtém a lista de participantes atuais no banco de dados
-    const currentParticipantsSnapshot = await get(participantsRef);
-    const currentParticipants = currentParticipantsSnapshot.val() || [];
-
-    // Adiciona o novo participante ao array de participantes atual
-    const updatedParticipants = [
-      ...currentParticipants,
-      { id: uuidv4(), name: newParticipant, amountPaid: 0 },
-    ];
-
-    // Atualiza a lista de participantes no banco de dados com o novo array
-    await set(participantsRef, updatedParticipants);
-
-    // Retorne true para indicar sucesso
-    return true;
-  } catch (error) {
-    // Caso ocorra um erro ao adicionar o participante
-    console.error("Erro ao adicionar participante ao evento no banco de dados", error);
-    // Retorne false para indicar falha
-    return false;
-  }
+  const newParticipant = { id: newParticipantRef.key, name: participantName, amountPaid: 0 };
+  await set(newParticipantRef, newParticipant);
 };
-
 
 // Função para obter os participantes do evento do banco de dados
 export const getParticipantsFromDatabase = async (eventId) => {
@@ -68,6 +48,40 @@ export const getParticipantsFromDatabase = async (eventId) => {
       return [];
     }
   } catch (error) {
-    console.error("Erro ao obter os participantes do evento do banco de dados", error);
+    console.error(
+      "Erro ao obter os participantes do evento do banco de dados",
+      error
+    );
   }
+};
+
+// Função que adiciona o um novo pagamento no participante do evento
+export const addPaymentToParticipant = async (data) => {
+  const { eventId, participantId, amount } = data;
+  const paymentsRef = ref(
+    database,
+    `events/${eventId}/participants/${participantId}/payments`
+  );
+
+  try {
+    const currentPaymentsSnapshot = await get(paymentsRef);
+    const currentPayments = currentPaymentsSnapshot.val() || [];
+
+    const updatedPayments = [...currentPayments, { id: uuidv4(), amount }];
+    await set(paymentsRef, updatedPayments);
+    return true;
+  } catch (error) {
+    console.error("Erro ao adicionar pagamento no banco de dados", error);
+    return false;
+  }
+};
+
+// Função para encontrar o ID de um participante com base no nome
+export const findParticipantIdByName = (participants, participantName) => {
+  for (const participant of participants) {
+    if (participant.studentName === participantName) {
+      return participant.id;
+    }
+  }
+  return null; // Retorna null se o participante não for encontrado
 };
